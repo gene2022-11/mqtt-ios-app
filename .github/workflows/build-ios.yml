@@ -28,35 +28,59 @@ jobs:
     - name: Install iOS platform
       run: cordova platform add ios
     
-    - name: Build iOS app
+    - name: Update deployment target
       run: |
-        cordova build ios --device --release
+        # Update CordovaLib deployment target to 12.0
+        if [ -f "platforms/ios/cordova/build.xcconfig" ]; then
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 11.0/IPHONEOS_DEPLOYMENT_TARGET = 12.0/g' platforms/ios/cordova/build.xcconfig
+        fi
+    
+    - name: Build iOS app (unsigned)
+      run: |
+        cordova build ios --debug \
+          --buildFlag="-allowProvisioningUpdates" \
+          --buildFlag="CODE_SIGN_IDENTITY=" \
+          --buildFlag="CODE_SIGNING_REQUIRED=NO" \
+          --buildFlag="CODE_SIGNING_ALLOWED=NO"
     
     - name: List build outputs
       run: |
         echo "Build completed. Looking for outputs..."
-        find platforms/ios/build -name "*.app" -o -name "*.ipa" || echo "No .app or .ipa files found yet"
+        find platforms/ios/build -type f -name "*.app" || echo "No .app files found"
+        ls -la platforms/ios/build/emulator/ || echo "Emulator directory not found"
         ls -la platforms/ios/build/ || echo "Build directory not found"
     
-    - name: Upload iOS App
+    - name: Upload iOS App (Simulator Build)
       uses: actions/upload-artifact@v4
       with:
-        name: mqtt-control-ios-app
-        path: |
-          platforms/ios/build/device/*.app
-          platforms/ios/build/device/*.ipa
+        name: mqtt-control-ios-app-simulator
+        path: platforms/ios/build/emulator/*.app
         if-no-files-found: warn
     
-    - name: Upload Xcode Project
+    - name: Upload Xcode Project (for manual signing on Mac)
       uses: actions/upload-artifact@v4
       with:
-        name: xcode-project
-        path: platforms/ios/
+        name: xcode-project-for-signing
+        path: |
+          platforms/ios/*.xcodeproj
+          platforms/ios/*.xcworkspace
+          platforms/ios/www
+          platforms/ios/CordovaLib
+          platforms/ios/MQTT Control
         if-no-files-found: warn
 
     - name: Build summary
       run: |
         echo "## Build Complete! 🎉" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "Your iOS app has been built successfully." >> $GITHUB_STEP_SUMMARY
-        echo "Download the artifacts to get your .app file." >> $GITHUB_STEP_SUMMARY
+        echo "### What you got:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Simulator Build**: Unsigned .app file for iOS Simulator testing" >> $GITHUB_STEP_SUMMARY
+        echo "- **Xcode Project**: Complete project to open on a Mac for signing and device deployment" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Next steps:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Download the 'xcode-project-for-signing' artifact" >> $GITHUB_STEP_SUMMARY
+        echo "2. Extract it on a Mac" >> $GITHUB_STEP_SUMMARY
+        echo "3. Open 'MQTT Control.xcworkspace' in Xcode" >> $GITHUB_STEP_SUMMARY
+        echo "4. Connect your iPhone and select it as the target" >> $GITHUB_STEP_SUMMARY
+        echo "5. In Xcode: Signing & Capabilities → Select your Team" >> $GITHUB_STEP_SUMMARY
+        echo "6. Click Run ▶️ to install on your iPhone" >> $GITHUB_STEP_SUMMARY
