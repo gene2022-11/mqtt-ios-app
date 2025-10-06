@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.yourcompany.mqttcontrol" version="1.0.0" 
+        xmlns="http://www.w3.org/ns/widgets" 
+        xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>MQTT Control</name>
+    <description>
+        MQTT Control Application for iOS - Communicate with devices via MQTT
+    </description>
+    <author email="you@example.com" href="https://example.com">
+        Your Name
+    </author>
+    
+    <content src="index.html" />
+    
+    <access origin="*" />
+    <allow-navigation href="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackgroundColor" value="0xff1f2937" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#1f2937" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+    <preference name="Fullscreen" value="false" />
+    
+    <!-- iOS specific settings -->
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+        
+        <!-- Use WKWebView (modern) -->
+        <preference name="WKWebViewOnly" value="true" />
+        <preference name="CordovaWebViewEngine" value="CDVWKWebView" />
+        
+        <!-- Orientation -->
+        <preference name="Orientation" value="portrait" />
+        
+        <!-- Allow network access for MQTT -->
+        <edit-config target="NSAppTransportSecurity" file="*-Info.plist" mode="merge">
+            <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
+                <key>NSAllowsArbitraryLoadsInWebContent</key>
+                <true/>
+            </dict>
+        </edit-config>
+        
+        <!-- App Icons (will be generated) -->
+        <icon src="res/icon.png" width="1024" height="1024" />
+        <icon src="res/icon.png" width="180" height="180" />
+        <icon src="res/icon.png" width="120" height="120" />
+        <icon src="res/icon.png" width="167" height="167" />
+        <icon src="res/icon.png" width="152" height="152" />
+        <icon src="res/icon.png" width="87" height="87" />
+        <icon src="res/icon.png" width="80" height="80" />
+        <icon src="res/icon.png" width="60" height="60" />
+        <icon src="res/icon.png" width="58" height="58" />
+        <icon src="res/icon.png" width="40" height="40" />
+        <icon src="res/icon.png" width="29" height="29" />
+        <icon src="res/icon.png" width="20" height="20" />
+        
+        <!-- Splash Screen -->
+        <splash src="res/screen.png" />
+    </platform>
+</widget>
